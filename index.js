@@ -1,5 +1,4 @@
 import express from 'express';
-import multer from 'multer';
 
 const app = express();
 const routerProductos = express.Router();
@@ -36,19 +35,7 @@ let arrayProducts = [
   },
 ];
 
-// RUTAS
-routerProductos.get('/', (req, res) => {
-  res.json(arrayProducts);
-});
-
-routerProductos.get('/:id', (req, res) => {
-  let id = req.params.id;
-  let product = arrayProducts.find((product) => product.id == id);
-  product != undefined
-    ? res.json(product)
-    : res.json({ error: `Product ${id} not found` });
-});
-
+//#region Middlewares
 function validateProduct(req, res, next) {
   let product = req.body;
   if (
@@ -67,24 +54,6 @@ function newId(req, res, next) {
   next();
 }
 
-routerProductos.post('/', validateProduct, newId, (req, res) => {
-  arrayProducts.push(req.body);
-  res.json(req.body);
-});
-
-routerProductos.put('/:id', validateProduct, (req, res) => {
-  let id = req.params.id;
-  let product = req.body;
-  let index = arrayProducts.findIndex((product) => product.id == id);
-  if (index != -1) {
-    product.id = parseInt(id);
-    arrayProducts[index] = product;
-    res.json(arrayProducts[index]);
-  } else {
-    res.json({ error: `Product ${id} not found` });
-  }
-});
-
 function existProduct(req, res, next) {
   let id = req.params.id;
   let product = arrayProducts.find((product) => product.id == id);
@@ -93,14 +62,52 @@ function existProduct(req, res, next) {
     : res.status(400).json({ error: `Product ${id} not found` });
 }
 
+function updateProduct(req, res, next) {
+  let id = req.params.id;
+  let index = arrayProducts.findIndex((product) => product.id == id);
+  if (index != -1) {
+    req.body.id = parseInt(id);
+    arrayProducts[index] = req.body;
+    next();
+  } else {
+    res.json({ error: `Product ${id} not found` });
+  }
+}
+
+//#endregion
+
+//#region  RUTAS
+routerProductos.get('/', (req, res) => {
+  res.json(arrayProducts);
+});
+
+routerProductos.get('/:id', existProduct, (req, res) => {
+  let id = req.params.id;
+  let product = arrayProducts.find((product) => product.id == id);
+  res.json(product);
+});
+
+routerProductos.post('/', validateProduct, newId, (req, res) => {
+  arrayProducts.push(req.body);
+  res.json(req.body);
+});
+
+routerProductos.put('/:id', validateProduct, updateProduct, (req, res) => {
+  res.json(req.body);
+});
+
 routerProductos.delete('/:id', existProduct, (req, res) => {
   let id = req.params.id;
   arrayProducts = arrayProducts.filter((product) => product.id != id);
   res.json(`Product ${id} deleted successfully`);
 });
 
+//#endregion
+
+//#region Server Listen
 const PORT = 8080;
 const server = app.listen(PORT, () => {
   console.log(`Servidor http escuchando en el puerto ${server.address().port}`);
 });
 server.on('error', (error) => console.log(`Error en servidor ${error}`));
+//#endregion
