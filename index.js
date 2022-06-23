@@ -29,14 +29,6 @@ function existProduct(req, res, next) {
     : res.status(400).json({ error: `Product ${id} not found` });
 }
 
-function updateProduct(req, res, next) {
-  let id = req.params.id;
-  let product = req.body;
-  apiProducts.updateProduct(product, id) == true
-    ? next()
-    : res.json({ error: `Product ${id} not found` });
-}
-
 //#endregion
 
 //#region  RUTAS
@@ -57,8 +49,9 @@ routerProductos.post('/', validateProduct, (req, res) => {
   res.json(product);
 });
 
-routerProductos.put('/:id', validateProduct, updateProduct, (req, res) => {
-  res.json(req.body);
+routerProductos.put('/:id', validateProduct, existProduct, (req, res) => {
+  let product = apiProducts.updateProduct(req.body, req.params.id);
+  res.json(product);
 });
 
 routerProductos.delete('/:id', existProduct, (req, res) => {

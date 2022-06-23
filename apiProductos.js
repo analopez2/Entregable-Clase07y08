@@ -54,16 +54,13 @@ class Products {
   }
 
   updateProduct(product, id) {
-    if (this.existsProduct(id)) {
-      let index = this.arrayProducts.findIndex((product) => product.id == id);
-      if (index != -1) {
-        product.id = parseInt(id);
-        this.arrayProducts[index] = product;
-        return true;
-      }
-    } else {
-      return false;
+    let index = this.arrayProducts.findIndex((product) => product.id == id);
+    if (index != -1) {
+      product.id = parseInt(id);
+      this.arrayProducts[index] = product;
     }
+
+    return this.arrayProducts[index];
   }
 
   saveProduct(product) {
