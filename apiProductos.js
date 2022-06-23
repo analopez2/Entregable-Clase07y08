@@ -71,11 +71,15 @@ class Products {
     this.arrayProducts.push(product);
   }
 
-  getProduct(id) {
+  getAll() {
+    return this.arrayProducts;
+  }
+
+  getById(id) {
     return this.arrayProducts.find((product) => product.id == id);
   }
 
-  deleteProduct(id) {
+  deleteById(id) {
     this.arrayProducts = this.arrayProducts.filter(
       (product) => product.id != id
     );

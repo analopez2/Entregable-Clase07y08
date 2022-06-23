@@ -41,12 +41,13 @@ function updateProduct(req, res, next) {
 
 //#region  RUTAS
 routerProductos.get('/', (req, res) => {
-  res.json(apiProducts.arrayProducts);
+  let products = apiProducts.getAll();
+  res.json(products);
 });
 
 routerProductos.get('/:id', existProduct, (req, res) => {
   let id = req.params.id;
-  let product = apiProducts.getProduct(id);
+  let product = apiProducts.getById(id);
   res.json(product);
 });
 
@@ -62,7 +63,7 @@ routerProductos.put('/:id', validateProduct, updateProduct, (req, res) => {
 
 routerProductos.delete('/:id', existProduct, (req, res) => {
   let id = req.params.id;
-  apiProducts.deleteProduct(id);
+  apiProducts.deleteById(id);
   res.json(`Product ${id} deleted successfully`);
 });
 
